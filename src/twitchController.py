@@ -9,12 +9,14 @@ import os
 class TwitchChatBot:
     def __init__(
         self,
+        obs_controller = None,
         app_id: str | None = None,
         app_secret: str | None = None,
         target_channel: str = "casualchaosttv",
         user_scope: list[AuthScope] | None = None,
     ) -> None:
         # Config
+        self.obs_controller = obs_controller
         self.app_id = app_id or os.environ.get("TWITCH_BOT_TOKEN")
         self.app_secret = app_secret or os.environ.get("TWITCH_BOT_SECRET")
         self.target_channel = target_channel
@@ -30,7 +32,7 @@ class TwitchChatBot:
     # ========= Event handlers =========
 
     async def on_ready(self, ready_event: EventData):
-        print('Bot is ready for work, joining channels')
+        print('Bot is ready for work, joining channel')
         # join our target channel, if you want to join multiple, either call join for each individually
         # or even better pass a list of channels as the argument
         await ready_event.chat.join_room(self.target_channel)
@@ -38,7 +40,6 @@ class TwitchChatBot:
 
     async def on_message(self, msg: ChatMessage):
         print(f"in {msg.room.name}, {msg.user.name} said: {msg.text}")
-        # later: forward to OBS overlay, log to file, trigger effects, etc.
 
     async def on_sub(self, sub: ChatSub):
         print(
@@ -46,15 +47,13 @@ class TwitchChatBot:
             f"  Type: {sub.sub_plan}\n"
             f"  Message: {sub.sub_message}"
         )
-        # later: show alert on stream, play sound, etc.
 
-    async def on_reply_command(self, cmd: ChatCommand):
+    async def test_command(self, cmd: ChatCommand):
         if len(cmd.parameter) == 0:
             await cmd.reply("you did not tell me what to reply with")
         else:
             await cmd.reply(f"{cmd.user.name}: {cmd.parameter}")
 
-    # ========= Setup / lifecycle =========
 
     async def setup(self):
         """Create Twitch + Chat clients and register events/commands."""
@@ -76,10 +75,9 @@ class TwitchChatBot:
         self.chat.register_event(ChatEvent.SUB, self.on_sub)
 
         # Commands
-        self.chat.register_command("reply", self.on_reply_command)
+        self.chat.register_command("reply", self.test_command)
 
     async def run(self):
-        """Start the chat bot and keep it alive until user stops it."""
         await self.setup()
         assert self.chat is not None
         assert self.twitch is not None

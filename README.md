@@ -1,4 +1,8 @@
-# OBS Web Socket Python Wrapper
+# twitchController
+
+## Getting Started
+
+# obsController
 
 ## Getting Started
 

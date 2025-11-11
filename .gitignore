@@ -1,5 +1,7 @@
 # dont upload my config pls
 *.toml
+
+customEffects.py
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
